@@ -1,5 +1,6 @@
 package uk.org.openseizuredetector.hrmonitor;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -42,6 +43,20 @@ public class HrmUtil {
         mContext.stopService(hrmServerIntent);
     }
 
-
+    /**
+     * isHrMonitorServiceRunning()
+     * @return the number of instances of HrMonitorService that are running
+     */
+    public int isHrMonitorServiceRunning() {
+        int nInstances = 0;
+        Class serviceClass = HrMonitorService.class;
+        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                nInstances++;
+            }
+        }
+        return nInstances;
+    }
 
 }

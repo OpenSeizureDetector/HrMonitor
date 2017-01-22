@@ -23,6 +23,7 @@ import java.util.TimerTask;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -73,7 +74,14 @@ public class HrMonitor extends Activity {
             @Override
             public void onClick(View view) {
                 Log.v(TAG, "start_server_button");
-                mUtil.startServer();
+                int nInstances = mUtil.isHrMonitorServiceRunning();
+                if (nInstances==0) {
+                    Log.v(TAG,"starting server...");
+                    mUtil.startServer();
+                } else {
+                    Log.v(TAG,"stopping server...");
+                    mUtil.stopServer();
+                }
             }
         });
     }
@@ -82,11 +90,20 @@ public class HrMonitor extends Activity {
     protected void onStart() {
         super.onStart();
         Log.v(TAG,"onStart()");
-        mUtil.startServer();
+
+        //int nInstances = mUtil.isHrMonitorServiceRunning();
+        //if (nInstances > 0) {
+        //    Log.v(TAG,"HrMonitorService Already Running - not starting - "+nInstances+" instances.");
+        //} else {
+        //    Log.v(TAG,"Starting HrMonitorService");
+        //    mUtil.startServer();
+        //}
+
         SharedPreferences SP = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         mHrmAddrStr = SP.getString("HrmAddr", "10");
         Log.v(TAG, "onStart() - mHrmAddrStr = " + mHrmAddrStr);
+
         mUiTimer = new Timer();
         mUiTimer.schedule(new UpdateUITask(), 0, 1000);
         updateUi();
@@ -105,6 +122,16 @@ public class HrMonitor extends Activity {
                     TextView tv;
                     tv = (TextView) findViewById(R.id.hrm_addr_tv);
                     tv.setText(mHrmAddrStr);
+
+                    int nInstances = mUtil.isHrMonitorServiceRunning();
+                    tv = (TextView) findViewById(R.id.service_tv);
+                    tv.setText(" Service Count: "+nInstances);
+                    Button b = (Button) findViewById(R.id.start_server_button);
+                    if (nInstances==0) {
+                        b.setText("Start Server");
+                    } else {
+                        b.setText("Stop Server");
+                    }
 
                     int hr = -1;
                     long dateInt = -1;
@@ -133,7 +160,7 @@ public class HrMonitor extends Activity {
      * @param rows
      */
     private void plotChart(Cursor rows) {
-        Log.v(TAG,"plotChart() - nRows = "+rows.getCount());
+        //Log.v(TAG,"plotChart() - nRows = "+rows.getCount());
         rows.moveToFirst();
         long lastMillis = rows.getLong(1);  // Get number of ms of last record.
         ArrayList<Entry> entries = new ArrayList();
@@ -149,11 +176,24 @@ public class HrMonitor extends Activity {
         ScatterDataSet dataset = new ScatterDataSet(entries, "HR (bpm)");
         ScatterData data = new ScatterData(dataset);
         scatterChart.setData(data);
-        scatterChart.setTouchEnabled(false);
+        data.setDrawValues(false);
+
+        // Format primary Y axis.
         YAxis yAxis = scatterChart.getAxisLeft();
         yAxis.setAxisMinimum(0F);
         yAxis.setAxisMaximum(220F);
-        data.setDrawValues(false);
+
+        // Disable secondary Y axis.
+        YAxis yAxis2 = scatterChart.getAxisRight();
+        yAxis2.setDrawGridLines(false);
+        yAxis2.setDrawLabels(false);
+
+        try {
+            scatterChart.getLegend().setEnabled(false);
+        } catch (NullPointerException e) {
+            Log.v(TAG,"Null Pointer Exception setting legend");
+        }
+        scatterChart.setTouchEnabled(false);
 
 
 

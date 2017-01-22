@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_hr_monitor"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -12,39 +12,52 @@
     tools:context="uk.org.openseizuredetector.hrmonitor.HrMonitor">
 
     <Button
-        android:text="Scan for HRM"
+        android:id="@+id/scan_ble_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/scan_ble_button" />
+        android:text="Scan for HRM" />
 
     <Button
-        android:text="Start Server"
+        android:id="@+id/start_server_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/start_server_button" />
+        android:text="Start Server" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/hrm_addr_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hrm_addr_tv" />
+
+        <TextView
+            android:id="@+id/service_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="service_tv" />
+    </LinearLayout>
 
     <TextView
-        android:text="hrm_addr_tv"
+        android:id="@+id/hrm_name_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/hrm_addr_tv" />
+        android:text="hrm_name_tv" />
 
     <TextView
-        android:text="hrm_name_tv"
+        android:id="@+id/heart_rate_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/hrm_name_tv" />
+        android:text="heart_rate_tv" />
 
     <TextView
-        android:text="heart_rate_tv"
+        android:id="@+id/heart_time_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/heart_rate_tv" />
-    <TextView
-        android:text="heart_time_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/heart_time_tv" />
+        android:text="heart_time_tv" />
 
     <com.github.mikephil.charting.charts.ScatterChart
         android:id="@+id/chart1"

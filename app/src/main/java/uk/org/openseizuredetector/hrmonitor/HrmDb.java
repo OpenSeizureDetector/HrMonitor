@@ -73,7 +73,7 @@ public class HrmDb {
      * @return a Cursor object contining the data.
      */
     public Cursor getLatestReadings(int numReadings) {
-        Log.v(TAG,"getLatestReadings()");
+        //Log.v(TAG,"getLatestReadings()");
         // Select column list
         String[] projection = {
                 "ID", HR_DATA_COL_DATETIME, HR_DATA_COL_HR, HR_DATA_COL_NOTE
@@ -92,7 +92,7 @@ public class HrmDb {
                 sortOrder,                                 // The sort order
                 numReadings+""                            // Max number of records to return
         );
-        Log.v(TAG,"returning "+cursor.getCount()+" rows");
+        //Log.v(TAG,"returning "+cursor.getCount()+" rows");
         return cursor;
     }
 

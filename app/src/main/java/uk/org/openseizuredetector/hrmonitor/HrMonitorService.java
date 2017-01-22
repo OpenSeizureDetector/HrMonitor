@@ -1,5 +1,8 @@
 package uk.org.openseizuredetector.hrmonitor;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,6 +28,8 @@ import java.util.UUID;
 
 public class HrMonitorService extends Service {
     private final static String TAG = "HrMonitorService";
+    private static final int NOTIFICATION_ID = 1;
+
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -66,8 +71,9 @@ public class HrMonitorService extends Service {
         }
     }
 
+
     public HrMonitorService() {
-        Log.v(TAG,"HrMonitorService():");
+        Log.v(TAG,"HrMonitorService(): Constructor");
     }
 
     @Override
@@ -75,6 +81,18 @@ public class HrMonitorService extends Service {
         super.onCreate();
         mHrmDb = new HrmDb(this);
         Log.v(TAG,"onCreate()");
+    }
+
+    @Override
+    public void onDestroy() {
+        // Cancel the notification.
+        Log.v(TAG, "onDestroy(): cancelling notification");
+        NotificationManager nM = (NotificationManager)(getSystemService(Context.NOTIFICATION_SERVICE));
+        nM.cancel(NOTIFICATION_ID);
+
+        disconnect();
+        close();
+
     }
 
     @Override
@@ -97,6 +115,7 @@ public class HrMonitorService extends Service {
         } else {
             Log.v(TAG,"onStartCommand - initialize failed....");
         }
+        showNotification();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -113,6 +132,34 @@ public class HrMonitorService extends Service {
         close();
         return super.onUnbind(intent);
     }
+
+    /**
+     * Show a notification while this service is running.
+     */
+    private void showNotification() {
+        Log.v(TAG, "showNotification()");
+        int iconId;
+        iconId = R.drawable.icon;
+
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent contentIntent =
+                PendingIntent.getActivity(this,
+                        0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification.Builder builder = new Notification.Builder(this);
+        Notification notification = builder.setContentIntent(contentIntent)
+                .setSmallIcon(iconId)
+                .setTicker("HeartRateMonitor")
+                .setAutoCancel(false)
+                .setContentTitle("HeartRateMonitor")
+                .setContentText("ContentText")
+                .build();
+
+        NotificationManager nM = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nM.notify(NOTIFICATION_ID, notification);
+    }
+
+
 
     /**
      * Initializes a reference to the local Bluetooth adapter.

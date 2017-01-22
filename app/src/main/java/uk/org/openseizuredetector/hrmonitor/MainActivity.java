@@ -13,5 +13,6 @@ public class MainActivity extends Activity {
 
         Intent i = new Intent(this,HrMonitor.class);
         startActivity(i);
+        finish();
     }
 }
